@@ -84,12 +84,12 @@ class Snake():
         self.is_food_on_screen = bool
 
 
-    def game_start(self,key):
+    def game_start(self,key):               ##the key make the snake spawn in different places of the map
         if key == 0:
             self.head = [int((BOARD_SIZE / 4) * 3), int(BOARD_SIZE / 4)]
             self.body = [[self.head[0], self.head[1]], [ self.head[0] - 1,  self.head[1]],
                           [ self.head[0] - 2,  self.head[1]]]
-            self.direction = 'DOWN'                                                                         ##the key make the snake spawn in different places of the map
+            self.direction = 'DOWN'                                    
         if key == 1:
             self.head = [int(BOARD_SIZE / 4), int(BOARD_SIZE / 4)]
             self.body = [[ self.head[0], self.head[1]], [ self.head[0] - 1,  self.head[1]],
