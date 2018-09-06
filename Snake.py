@@ -84,38 +84,42 @@ class Snake():
         self.is_food_on_screen = bool
 
 
-    def game_start(self,key):               ##the key make the snake spawn in different places of the map
+    def game_start(self,key):
         if key == 0:
             self.head = [int((BOARD_SIZE / 4) * 3), int(BOARD_SIZE / 4)]
             self.body = [[self.head[0], self.head[1]], [ self.head[0] - 1,  self.head[1]],
                           [ self.head[0] - 2,  self.head[1]]]
-            self.direction = 'DOWN'                                    
+            self.direction = 'DOWN'     ##the key make the snake spawn in different places of the map
+            prev_action= 0.25
         if key == 1:
             self.head = [int(BOARD_SIZE / 4), int(BOARD_SIZE / 4)]
             self.body = [[ self.head[0], self.head[1]], [ self.head[0] - 1,  self.head[1]],
                           [ self.head[0] - 2, self.head[1]]]
             self.direction = 'RIGHT'
+            prev_action = -0.5
         if key == 2:
             self.head = [int((BOARD_SIZE / 4) * 3), int((BOARD_SIZE / 4) * 3)]
             self.body = [[ self.head[0],  self.head[1]], [ self.head[0] - 1, self.head[1]],
                           [ self.head[0] - 2, self.head[1]]]
             self.direction = 'UP'
+            prev_action = 0
         if key == 3:
             self.head = [int(BOARD_SIZE / 4), int((BOARD_SIZE / 4)) * 3]
             self.body = [[ self.head[0],  self.head[1]], [ self.head[0] - 1,  self.head[1]],
                           [ self.head[0] - 2, self.head[1]]]
             self.direction = 'UP'
+            prev_action = 0
         self.window = pygame.display.set_mode((BOARD_SIZE * BLOCK_SIZE, BOARD_SIZE * BLOCK_SIZE))
         pygame.display.set_caption('Snake Game')
         self.fps = pygame.time.Clock()
-        return self.generate_observation()
+        return self.generate_observation(prev_action)
         ''''for i in range(3):
           pygame.display.set_caption('SNAKE GAME | Game Starts in ' + str(3-i) +' second(s)...')
           pygame.time.wait(1000)'''''
 
 
-    def generate_observation(self):
-        return self.done,self.score,self.food,self.body
+    def generate_observation(self,prev_action):
+        return self.done,self.score,self.food,self.body,prev_action
 
 
     def game_over(self):
@@ -167,8 +171,8 @@ class Snake():
             else:
                 self.window.fill(pygame.Color(225, 225, 225))
 
-            self.head_value = 1 
-            
+            self.head_value = 1
+
             #draw snake
             for pos in self.get_body():
                 if self.head_value == 1:
@@ -186,15 +190,15 @@ class Snake():
 
             if self.Collision() == 1:
                 self.done =True
-                return self.generate_observation()
+                return self.generate_observation(action)
                 self.game_over()
 
             pygame.display.set_caption('SNAKE GAME | Speed: ' + str(GAME_SPEED) + ' | Score: ' + str(self.score))
             pygame.display.flip()
             self.fps.tick(GAME_SPEED)
 
-            return self.generate_observation()
-    def step(self,action = 0):                             
+            return self.generate_observation(action)
+    def step(self,action = 0):
         if int(action) == 0:
             self.change_direction('RIGHT')
                                                              ##to send data to the neural net whitout visualise the game
@@ -214,10 +218,10 @@ class Snake():
 
         if self.Collision() == 1:
             self.done = True
-            return self.generate_observation()
+            return self.generate_observation(action)
             self.game_over()
 
-        return self.generate_observation()
+        return self.generate_observation(action)
 
 
 if __name__ == '__main__':
