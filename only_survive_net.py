@@ -13,7 +13,7 @@ except:
 
 class net():
 
-    def __init__(self,initial_games = 60000, test_games= 40, goal_steps = 6000,lr = 1e-2,filename = 'snake_nn.tflearn'):
+    def __init__(self,initial_games = 100000, test_games= 40, goal_steps = 10000,lr = 1e-2,filename = 'snake_nn.tflearn'):
         self.initial_games = initial_games
         self.test_games =test_games
         self.goal_steps =goal_steps
@@ -27,30 +27,30 @@ class net():
 
             game = Snake()
 
-            _,prev_score,food,snake = game.game_start(key%4)
+            _,prev_score,food,snake,prev_action= game.game_start(key%4)
             key+=1
 
             prev_observation = self.generate_observation(snake)
 
-            prev_action=0
+
             for _ in range(self.goal_steps):
 
                 action = int(random.randint(0,3))
                 prev_observation = self.add_action_to_observation(prev_observation, prev_action)
-                done,score,_,snake= game.step(action = action)
+                done,score,_,snake,prev_action= game.step(action = action)
 
                 label = np.zeros(4)
                 if done:
                     break
                 elif prev_observation[1] == 0 and prev_observation[2] == 0 and prev_observation[3]== 0 :
-                    prev_action = action
+                    prev_action = action/4 - 0.5
                     prev_observation = self.generate_observation(snake)
 
 
                 else:
                     label[action] +=1
                     training_data.append([prev_observation, label])
-                    prev_action =action
+                    prev_action =action/4 - 0.5
                     prev_observation= self.generate_observation(snake)
 
         return training_data
@@ -125,9 +125,9 @@ class net():
             steps = 0
             game_memory = []
             game= Snake()
-            _,_,_,snake = game.game_start(1)
+            _,_,_,snake,prev_action= game.game_start(1)
             prev_observation = self.generate_observation(snake= snake)
-            prev_action = 0
+
             for _ in range(self.goal_steps):
 
                 prev_observation = self.add_action_to_observation(prev_observation, prev_action)
@@ -138,9 +138,9 @@ class net():
                     print('***', prev_observation)
                     print(model.predict(prev_observation.reshape(-1, 5, 1)))
                     print(action)
-                done,_,_,snake = game.play(action=action)
+                done,_,_,snake,prev_action = game.play(action=action)
 
-                prev_action = action
+                prev_action = action/4 - 0.5
 
                 game_memory.append([prev_observation,action])
 
